@@ -10,21 +10,64 @@ class TTTBoard:
             represent moves by player 'O' and '*'s are spots no one has yet played on
     """
 
-    pass
+    def __init__(self):
+        """Initialize an empty 3x3 board"""
+        self.board = ["*"] * 9
+
+    def __str__(self):
+        """Return a human-readable string of the board"""
+        rows = []
+        for i in range(0, 9, 3):
+            rows.append(" ".join(self.board[i:i+3]))
+        return "\n".join(rows)
+
+    def make_move(self, player: str, pos: int) -> bool:
+        """Place a move for `player` in position `pos`, if valid.
+
+        Args:
+            player: "X" or "O"
+            pos: int position 0–8
+
+        Returns:
+            True if move successful, False otherwise
+        """
+        if player not in ["X", "O"]:
+            return False
+        if not isinstance(pos, int) or pos < 0 or pos >= 9:
+            return False
+        if self.board[pos] != "*":
+            return False
+        self.board[pos] = player
+        return True
+
+    def has_won(self, player: str) -> bool:
+        """Check if given player has won"""
+        b = self.board
+        win_conditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
+            [0, 4, 8], [2, 4, 6]              # diagonals
+        ]
+        return any(all(b[i] == player for i in combo) for combo in win_conditions)
+
+    def game_over(self) -> bool:
+        """Return True if someone has won or board is full"""
+        if self.has_won("X") or self.has_won("O"):
+            return True
+        if "*" not in self.board:
+            return True
+        return False
+
+    def clear(self):
+        """Reset the board"""
+        self.board = ["*"] * 9
 
 
 def play_tic_tac_toe() -> None:
     """Uses your class to play TicTacToe"""
 
     def is_int(maybe_int: str):
-        """Returns True if val is int, False otherwise
-
-        Args:
-            maybe_int - string to check if it's an int
-
-        Returns:
-            True if maybe_int is an int, False otherwise
-        """
+        """Returns True if val is int, False otherwise"""
         try:
             int(maybe_int)
             return True
@@ -46,6 +89,8 @@ def play_tic_tac_toe() -> None:
 
         if brd.make_move(players[turn], int(move)):
             turn = not turn
+        else:
+            print("Invalid move, try again.")
 
     print(f"\nGame over!\n\n{brd}")
     if brd.has_won(players[0]):
@@ -53,13 +98,11 @@ def play_tic_tac_toe() -> None:
     elif brd.has_won(players[1]):
         print(f"{players[1]} wins!")
     else:
-        print(f"Board full, cat's game!")
+        print("Board full, cat's game!")
 
 
 if __name__ == "__main__":
-    # here are some tests. These are not at all exhaustive tests. You will DEFINITELY
-    # need to write some more tests to make sure that your TTTBoard class is behaving
-    # properly.
+    # Tests
     brd = TTTBoard()
     brd.make_move("X", 8)
     brd.make_move("O", 7)
@@ -88,5 +131,5 @@ if __name__ == "__main__":
 
     print("All tests passed!")
 
-    # uncomment to play!
-    # play_tic_tac_toe()
+    # Uncomment to play interactively
+    play_tic_tac_toe()
